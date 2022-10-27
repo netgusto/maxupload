@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"runtime"
 	"sync/atomic"
 	"time"
 
@@ -13,17 +14,18 @@ import (
 	"go.uber.org/ratelimit"
 )
 
-const WORKER_POOL_SIZE = 30 // number of parallel uploads at most
+const WORKER_POOL_SIZE = 200     // number of parallel uploads at most
+const CALLS_PER_5_MINUTES = 9999 // default is 1200
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 	cf_api_token := mustGetEnv("CLOUDFLARE_API_TOKEN")
 	cf_account_id := mustGetEnv("CLOUDFLARE_ACCOUNT_ID")
 
-	rl := ratelimit.New(1200-100, ratelimit.Per(time.Minute*5)) // 1200 requests every 5 minutes - 100 for safety
-
+	workerRl := ratelimit.New(CALLS_PER_5_MINUTES-100, ratelimit.Per(time.Minute*5)) // - 100 for safety
 	wp := workerpool.New(WORKER_POOL_SIZE)
 
-	api, err := cloudflare.NewWithAPIToken(cf_api_token)
+	api, err := cloudflare.NewWithAPIToken(cf_api_token, cloudflare.UsingRateLimit(CALLS_PER_5_MINUTES/(5*60)))
 	if err != nil {
 		panic(err)
 	}
@@ -35,10 +37,10 @@ func main() {
 
 	nbRunningWorkers := int64(0)
 
-	// import 5000 images
+	// import 5000 1.4MB png
 	for i := 0; i < 5000; i++ {
 
-		rl.Take() // This is a blocking call. Honors the rate limit
+		workerRl.Take() // This is a blocking call. Honors our worker dispatch the rate limit
 
 		i := i
 
