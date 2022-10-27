@@ -24,3 +24,7 @@ Upload #372: 543aa6f7-f7d3-4828-4bac-2fea53fb5b00; took 3320ms; rate: 24.0/s; th
 Upload #370: 9fe63213-9743-414f-31fb-79648ba11100; took 3391ms; rate: 23.9/s; throughput: 40.5 MB/s; 100 workers
 Upload #366: ca64f7e5-a1ff-4714-c44c-7edd836c4f00; took 3569ms; rate: 23.6/s; throughput: 40.5 MB/s; 100 workers
 ```
+
+## 🚨 Note on rate limiting 🚨
+
+It may be a good idea to not push uploads to the actual rate limiting of the account, as all calls made on this account by other systems are accounted for by Cloudflare, not only those of uploads; pushing it to the max would risk your account being (temporarily) blocked for api hammering.
