@@ -58,7 +58,6 @@ func main() {
 				panic(err)
 			}
 
-			totalBytes += fstat.Size()
 			uploadStart := time.Now()
 
 			img, err := api.UploadImage(ctx, cf_account_id, cloudflare.ImageUploadRequest{
@@ -70,14 +69,17 @@ func main() {
 				panic(err)
 			}
 
+			totalBytes += fstat.Size()
+
 			secondsSinceStart := time.Since(start).Seconds()
 			fmt.Printf(
-				"Upload #%v: %v; took %vms; rate: %.1f/s; throughput: %.1f MB/s; %v workers\n",
+				"Upload #%v: %v; took %vms; rate: %.1f/s; throughput: %.1f MB/s; total sent: %.1f MB; %v workers\n",
 				i,
 				img.ID,
 				time.Since(uploadStart).Milliseconds(),
 				float64(i)/secondsSinceStart,
 				float64(totalBytes/1024/1024)/secondsSinceStart,
+				float64(totalBytes)/1024/1024,
 				math.Max(0, float64(nbRunningWorkers)),
 			)
 		})
