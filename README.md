@@ -2,6 +2,8 @@
 
 Demonstration of upload to Cloudflare Images, maximizing upload rate while remaining below rate limit (default is 1200 api calls per 5 minutes, ie an avg of 4/s).
 
+Limits set to 200 workers / 9999 calls per 5 minutes (change this in the code to adapt values to your case).
+
 Bundled image is https://unsplash.com/photos/t8T1xTFqAXY by Michael G.
 
 ## usage
